@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2026 새해 하나님의 말씀 뽑기</title>
+    <title>2026 나를 위한 하나님의 말씀</title>
     
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="2026 새해 말씀 뽑기">
-    <meta property="og:title" content="2026 새해 하나님의 말씀 뽑기">
-    <meta property="og:description" content="새해를 시작하며 당신에게 주시는 하나님의 말씀을 지금 확인해보세요.">
-    <meta property="og:image" content="https://csy870617.github.io/todaybible/logo.png">
+    <meta property="og:site_name" content="하루말씀">
+    <meta property="og:title" content="2026 새해를 여는 하나님의 말씀">
+    <meta property="og:description" content="당신을 위한 말씀을 펼쳐보세요">
+    <meta property="og:image" content="https://csy870617.github.io/todaybible/thumbnail.png">
     <meta property="og:image:width" content="800">
     <meta property="og:image:height" content="400">
     <meta property="og:url" content="https://csy870617.github.io/todaybible/">
 
     <link rel="stylesheet" href="style.css">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -25,22 +26,13 @@
         (function() {
             const userAgent = navigator.userAgent.toLowerCase();
             const targetUrl = location.href;
-            // 카카오톡 인앱 브라우저 등에서 외부 브라우저로 열기 유도
             if (userAgent.match(/kakaotalk|naver|line|instagram|facebook|fbav|fbios/i)) {
-                // 안드로이드의 경우 intent 사용
                 if (userAgent.match(/android/i)) {
-                    // intent 스킴을 사용하여 크롬 등으로 열기 시도
-                    // package 명시를 제거하여 브라우저 선택창을 유도하거나 기본 브라우저로 열리게 함
                     location.href = 'intent://' + targetUrl.replace(/https?:\/\//i, '') + '#Intent;scheme=https;end';
-                } 
-                // iOS의 경우 (특히 카카오톡)
-                else if (userAgent.match(/iphone|ipad|ipod/i)) {
+                } else if (userAgent.match(/iphone|ipad|ipod/i)) {
                     if (userAgent.match(/kakaotalk/i)) {
-                        // 카카오톡 에서는 외부 브라우저 호출 스킴 사용
                         location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(targetUrl);
                     }
-                    // 다른 iOS 인앱 브라우저에 대한 처리가 필요하다면 여기에 추가
-                    // 예: 안내 메시지 표시 등
                 }
             }
         })();
@@ -51,46 +43,59 @@
     <div class="background-mesh"></div>
 
     <div class="glass-container">
+        
         <section id="page-landing" class="page active">
             <div class="header-content">
                 <p class="year-badge">2026 YEAR OF FAITH</p>
                 <h1 class="main-title">새해를 여는<br><span class="highlight">하나님의 말씀</span></h1>
-                <p class="sub-text">기도하는 마음으로<br>카드를 선택해주세요.</p>
+                <p class="sub-text">기도하는 마음으로<br>말씀을 열어주세요.</p>
             </div>
             
             <div class="card-area">
-                <div class="card-3d">
-                    <div class="card-face">
-                        <span class="cross-icon">✝</span>
-                        <span class="card-label">WORD OF GOD</span>
-                    </div>
+                <div class="card-3d envelope-red">
+                    <div class="envelope-flap"></div>
+                    <div class="envelope-seal">✝</div>
                 </div>
             </div>
 
             <button id="btn-draw" class="primary-btn glow-effect">말씀 열어 보기</button>
         </section>
 
+
         <section id="page-loading" class="page">
             <div class="loading-wrapper">
-                <div class="pulse-ring"></div>
+                <div class="neon-book">
+                    <div class="page"></div>
+                    <div class="page"></div>
+                    <div class="page"></div>
+                    <div class="page"></div>
+                    <div class="cover"></div>
+                </div>
                 <p class="loading-text">당신을 위한<br><span class="highlight">하나님의 말씀은?</span></p>
             </div>
         </section>
+
 
         <section id="page-result" class="page result-layout">
             <div class="image-frame-wrapper">
                 <img id="result-img" src="" alt="" style="cursor: zoom-in;">
             </div>
+            
             <div class="result-actions">
                 <div class="button-row">
-                    <button id="btn-download" class="action-btn dark-btn">⬇ 저장</button>
-                    <button id="btn-share" class="action-btn dark-btn highlight-btn">🔗 공유</button>
+                    <button id="btn-download" class="glass-btn btn-save">
+                        <span class="icon">⬇</span> <span class="label">이미지 저장</span>
+                    </button>
+                    <button id="btn-share" class="glass-btn btn-share">
+                        <span class="icon">🔗</span> <span class="label">친구와 공유</span>
+                    </button>
                 </div>
-                <button id="btn-retry" class="retry-btn">
-                    <span>↻ 다시 뽑기</span>
+                <button id="btn-retry" class="glass-btn btn-retry">
+                    <span class="icon">↻</span> 다시 뽑기
                 </button>
             </div>
         </section>
+
     </div>
 
     <div id="fullscreen-modal" class="fullscreen-modal">

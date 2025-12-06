@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalCards = 105;
     let currentCardUrl = "";
 
-    // 화면 전환 함수
     function showPage(page) {
         [landingPage, loadingPage, resultPage].forEach(p => p.classList.remove('active'));
         window.scrollTo(0, 0);
@@ -35,28 +34,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. 뽑기
     btnDraw.addEventListener('click', () => {
-        showPage(loadingPage);
+        const envelope = document.querySelector('.card-3d');
+        envelope.classList.add('open');
+
         setTimeout(() => {
-            const randomIndex = Math.floor(Math.random() * totalCards) + 1;
-            const formattedNum = String(randomIndex).padStart(3, '0');
-            currentCardUrl = `cards/${formattedNum}.JPG`; 
-            
-            const imgLoader = new Image();
-            imgLoader.src = currentCardUrl;
-            imgLoader.onload = () => {
-                resultImg.src = currentCardUrl;
-                showPage(resultPage);
-            };
-            imgLoader.onerror = () => {
-                alert(`이미지를 찾을 수 없습니다.\n경로: ${currentCardUrl}`);
-                showPage(landingPage);
-            }
-        }, 2000); 
+            showPage(loadingPage);
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * totalCards) + 1;
+                const formattedNum = String(randomIndex).padStart(3, '0');
+                currentCardUrl = `cards/${formattedNum}.JPG`; 
+                
+                const imgLoader = new Image();
+                imgLoader.src = currentCardUrl;
+                imgLoader.onload = () => {
+                    resultImg.src = currentCardUrl;
+                    showPage(resultPage);
+                };
+                imgLoader.onerror = () => {
+                    alert(`이미지를 찾을 수 없습니다.\n경로: ${currentCardUrl}`);
+                    showPage(landingPage);
+                }
+            }, 2000); 
+        }, 800); 
     });
 
     // 2. 다시 뽑기
     btnRetry.addEventListener('click', () => {
         resultImg.src = "";
+        const envelope = document.querySelector('.card-3d');
+        if (envelope) envelope.classList.remove('open');
         showPage(landingPage);
     });
 
@@ -71,16 +77,19 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    // 4. 공유하기 (✅ 카카오톡 메시지 내용 수정)
+    // 4. 공유하기
     btnShare.addEventListener('click', async () => {
+        const shareText = '당신의 말씀은 무엇인가요?';
         const shareUrl = window.location.href;
+        const finalShareText = `${shareText}\n${shareUrl}`;
 
-        // [1단계] 모바일 기본 공유 (링크만 전송)
+        // [1단계] 모바일 기본 공유
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: '2026 새해 하나님의 말씀 뽑기',
-                    url: shareUrl, 
+                    title: '2026 새해를 여는 하나님의 말씀',
+                    text: shareText,
+                    url: shareUrl,
                 });
                 return;
             } catch (err) {
@@ -91,18 +100,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // [2단계] 카카오톡 SDK 공유
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
-                const logoUrl = new URL('logo.png', SITE_URL).href;
+                // ✅ 썸네일 이미지 변경: thumbnail.png
+                const thumbUrl = new URL('thumbnail.png', SITE_URL).href;
 
                 Kakao.Share.sendDefault({
                     objectType: 'feed',
                     content: {
-                        // ✅ HTML 메타 태그와 동일한 제목/설명 사용
-                        title: '2026 새해 하나님의 말씀 뽑기',
-                        description: '새해를 시작하며 당신에게 주시는 하나님의 말씀을 지금 확인해보세요.',
-                        imageUrl: logoUrl,
+                        title: '2026 새해를 여는 하나님의 말씀',
+                        description: '2026년 당신을 위한 말씀은 무엇인가요?',
+                        imageUrl: thumbUrl, 
                         link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                     },
-                    buttons: [{ title: '말씀 뽑으러 가기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
+                    buttons: [{ title: '말씀 확인하기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
                 });
                 return;
             } catch (err) {}
@@ -110,17 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // [3단계] 클립보드 복사
         try {
-            await navigator.clipboard.writeText(shareUrl);
-            alert('주소가 복사되었습니다.');
+            await navigator.clipboard.writeText(finalShareText);
+            alert('주소가 복사되었습니다.\n원하시는 곳에 붙여넣기 하세요.');
         } catch (err) {
             alert('공유 기능을 사용할 수 없습니다.');
         }
     });
 
-    // =========================================
-    // ✅ 전체화면 & 뒤로가기 제어 로직
-    // =========================================
-
+    // 전체화면 & 뒤로가기
     const closeModal = () => {
         fullscreenModal.classList.remove('active');
         document.body.style.overflow = 'auto';
