@@ -24,10 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalCards = 105;
     let currentCardUrl = "";
 
+    // 화면 전환 함수
     function showPage(page) {
         [landingPage, loadingPage, resultPage].forEach(p => p.classList.remove('active'));
         window.scrollTo(0, 0);
         page.classList.add('active');
+        
+        // 페이지 전환 시 모달이 켜져있다면 닫기 (안전장치)
         fullscreenModal.classList.remove('active');
         document.body.style.overflow = 'auto';
     }
@@ -59,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showPage(landingPage);
     });
 
-    // 3. 저장하기 (원본 이미지 다운로드)
+    // 3. 저장하기
     btnDownload.addEventListener('click', () => {
         const link = document.createElement('a');
         link.href = currentCardUrl;
@@ -70,77 +73,85 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    // 4. 공유하기 (✅ 수정됨: 문구 + 링크만 깔끔하게 공유)
+    // 4. 공유하기
     btnShare.addEventListener('click', async () => {
-        const shareTitle = '2026 새해를 여는 하나님의 말씀';
-        const shareText = '당신의 2026년 새해를 여는 말씀은 무엇인가요?';
+        const shareText = '2026년 당신을 위한 하나님의 말씀은 무엇인가요?';
         const shareUrl = window.location.href;
+        const finalShareText = `${shareText}\n${shareUrl}`;
 
-        // --- [1단계] 모바일 기본 공유 (네이티브) ---
-        // 카톡, 문자, 인스타DM 등 설치된 앱 목록이 뜹니다.
+        // [1단계] 모바일 기본 공유
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: shareTitle,
+                    title: '2026 새해를 여는 하나님의 말씀',
                     text: shareText,
                     url: shareUrl,
                 });
-                return; // 공유 성공 시 종료
+                return;
             } catch (err) {
-                // 사용자가 취소했거나 에러 발생 시 다음 단계(카톡 SDK)로 넘어감
                 console.log('네이티브 공유 취소/실패');
             }
         }
 
-        // --- [2단계] 카카오톡 SDK 공유 (PC 등 네이티브 공유 불가능할 때) ---
+        // [2단계] 카카오톡 SDK 공유
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
-                // 로고 이미지 경로 (logo.png)
                 const logoUrl = new URL('logo.png', SITE_URL).href;
-
                 Kakao.Share.sendDefault({
                     objectType: 'feed',
                     content: {
-                        title: shareTitle,
-                        description: shareText,
-                        imageUrl: logoUrl, // 썸네일은 로고로 고정
-                        link: {
-                            mobileWebUrl: shareUrl,
-                            webUrl: shareUrl,
-                        },
+                        title: shareText, 
+                        description: '카드를 눌러 말씀을 확인해보세요.',
+                        imageUrl: logoUrl,
+                        link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                     },
-                    buttons: [
-                        {
-                            title: '말씀 뽑기',
-                            link: {
-                                mobileWebUrl: shareUrl,
-                                webUrl: shareUrl,
-                            },
-                        },
-                    ],
+                    buttons: [{ title: '말씀 확인하기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
                 });
                 return;
             } catch (err) {}
         }
 
-        // --- [3단계] 최후의 수단: 클립보드 복사 ---
+        // [3단계] 클립보드 복사
         try {
-            const textToCopy = `${shareText}\n${shareUrl}`;
-            await navigator.clipboard.writeText(textToCopy);
+            await navigator.clipboard.writeText(finalShareText);
             alert('주소가 복사되었습니다.\n원하시는 곳에 붙여넣기 하세요.');
         } catch (err) {
             alert('공유 기능을 사용할 수 없습니다.');
         }
     });
 
-    // 전체화면 기능
+    // =========================================
+    // ✅ [수정됨] 전체화면 & 뒤로가기 제어 로직
+    // =========================================
+
+    // 모달 닫기 함수
+    const closeModal = () => {
+        fullscreenModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    };
+
+    // 1. 이미지 클릭 시 -> 전체화면 열기 + 히스토리 추가
     resultImg.addEventListener('click', () => {
         fullscreenImg.src = currentCardUrl;
         fullscreenModal.classList.add('active');
         document.body.style.overflow = 'hidden';
+        
+        // 🚀 브라우저 히스토리에 'modal' 상태 추가 (가짜 페이지 이동 효과)
+        history.pushState({ modal: true }, null, "");
     });
+
+    // 2. 전체화면 모달 클릭 시 -> 닫기 (뒤로가기 실행)
     fullscreenModal.addEventListener('click', () => {
-        fullscreenModal.classList.remove('active');
-        document.body.style.overflow = 'auto';
+        // 직접 닫는 대신 뒤로가기를 실행하면 -> 아래 'popstate' 이벤트가 감지해서 닫아줌
+        history.back();
+    });
+
+    // 3. 브라우저 뒤로가기 버튼 감지 ('popstate' 이벤트)
+    window.addEventListener('popstate', () => {
+        // 뒤로가기를 눌렀을 때 모달이 열려있다면 닫기
+        if (fullscreenModal.classList.contains('active')) {
+            closeModal();
+            // (참고: 뒤로가기를 누르면 히스토리는 자동으로 하나 빠지므로 추가 작업 불필요)
+        }
     });
 });
