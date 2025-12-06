@@ -20,12 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultImg = document.getElementById('result-img');
     const fullscreenModal = document.getElementById('fullscreen-modal');
     const fullscreenImg = document.getElementById('fullscreen-img');
-    const envelopeArea = document.querySelector('.card-3d'); // ✅ 봉투 요소 선택
+    const envelopeArea = document.querySelector('.card-3d'); 
 
     const totalCards = 105;
     let currentCardUrl = "";
 
-    // 화면 전환 함수
     function showPage(page) {
         [landingPage, loadingPage, resultPage].forEach(p => p.classList.remove('active'));
         window.scrollTo(0, 0);
@@ -34,14 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = 'auto';
     }
 
-    // ✅ [통합됨] 뽑기 동작 실행 함수 (버튼 & 봉투 클릭 공통)
     const startDrawAction = () => {
         const envelope = document.querySelector('.card-3d');
-        
-        // 이미 열려있으면 중복 실행 방지
         if(envelope.classList.contains('open')) return;
 
-        envelope.classList.add('open'); // 봉투 열림 애니메이션
+        envelope.classList.add('open'); 
 
         setTimeout(() => {
             showPage(loadingPage);
@@ -64,11 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800); 
     };
 
-    // 1. 뽑기 이벤트 연결 (버튼 + 봉투)
+    // 이벤트 연결
     btnDraw.addEventListener('click', startDrawAction);
-    envelopeArea.addEventListener('click', startDrawAction); // ✅ 봉투 터치 시에도 작동
+    envelopeArea.addEventListener('click', startDrawAction); 
 
-    // 2. 다시 뽑기
+    // 다시 뽑기
     btnRetry.addEventListener('click', () => {
         resultImg.src = "";
         const envelope = document.querySelector('.card-3d');
@@ -76,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showPage(landingPage);
     });
 
-    // 3. 저장하기
+    // 저장하기
     btnDownload.addEventListener('click', () => {
         const link = document.createElement('a');
         link.href = currentCardUrl;
@@ -87,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    // 4. 공유하기
+    // 공유하기
     btnShare.addEventListener('click', async () => {
         const shareUrl = window.location.href;
 
@@ -106,7 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // [2단계] 카카오톡 SDK 공유
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
-                const thumbUrl = new URL('thumbnail.png', SITE_URL).href;
+                // ✅ [수정됨] 썸네일 이미지: thumbnail_1.png
+                const thumbUrl = new URL('thumbnail_1.png', SITE_URL).href;
 
                 Kakao.Share.sendDefault({
                     objectType: 'feed',
