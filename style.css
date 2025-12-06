@@ -1,0 +1,151 @@
+:root {
+    --bg-dark: #0f172a;
+    --text-light: #f8fafc;
+    --text-gray: #94a3b8;
+    --accent-neon: #4ade80; 
+    --accent-blue: #60a5fa;
+    --glass-bg: rgba(15, 23, 42, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: 'Noto Sans KR', sans-serif; /* 무료 폰트 적용 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+}
+
+.background-mesh {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+    background: var(--bg-dark);
+    background-image: 
+        radial-gradient(at 10% 0%, rgba(96, 165, 250, 0.3) 0px, transparent 50%),
+        radial-gradient(at 90% 0%, rgba(74, 222, 128, 0.3) 0px, transparent 50%),
+        radial-gradient(at 50% 80%, rgba(139, 92, 246, 0.3) 0px, transparent 50%);
+    filter: blur(60px);
+    animation: auroraMove 20s ease-in-out infinite alternate;
+}
+@keyframes auroraMove { 0% { background-position: 0% 0%; } 100% { background-position: 100% 50%; } }
+
+.glass-container {
+    width: 100%; max-width: 430px; height: 100%; max-height: 95vh;
+    background: var(--glass-bg);
+    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border);
+    border-radius: 30px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    position: relative; overflow: hidden; display: flex; flex-direction: column;
+}
+
+.page {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    padding: 30px 25px; 
+    display: flex; flex-direction: column;
+    align-items: center; text-align: center;
+    opacity: 0; pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); transform: translateY(20px);
+}
+.page.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+.highlight {
+    color: transparent;
+    background: linear-gradient(90deg, var(--accent-neon), var(--accent-blue));
+    -webkit-background-clip: text; background-clip: text;
+}
+
+/* 랜딩 & 로딩 */
+#page-landing { justify-content: space-between; padding-bottom: 40px; }
+.header-content { margin-top: 20px; }
+.year-badge { font-family: 'Montserrat', sans-serif; font-size: 0.9rem; letter-spacing: 3px; color: var(--accent-neon); font-weight: 800; margin-bottom: 15px; opacity: 0.9; }
+.main-title { font-family: 'Montserrat', 'Noto Sans KR', sans-serif; font-size: 2.5rem; font-weight: 800; line-height: 1.2; margin: 0 0 15px 0; letter-spacing: -1px; }
+.sub-text { color: var(--text-gray); font-size: 1rem; line-height: 1.6; }
+
+.card-area { perspective: 1000px; }
+.card-3d {
+    width: 170px; height: 260px;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border-radius: 20px; border: 2px solid rgba(255,255,255,0.05);
+    display: flex; justify-content: center; align-items: center;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
+    animation: floatCard 5s ease-in-out infinite;
+}
+.cross-icon { font-size: 3.5rem; color: var(--text-light); opacity: 0.8; }
+.card-face { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.card-label { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.8rem; letter-spacing: 1px; color: var(--accent-blue); }
+@keyframes floatCard { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(3deg); } }
+
+.primary-btn {
+    width: 100%; max-width: 320px; padding: 18px;
+    border: none; border-radius: 18px; font-size: 1.1rem; font-weight: 700;
+    font-family: 'Noto Sans KR', sans-serif; color: #0f172a;
+    background: linear-gradient(90deg, var(--accent-neon), var(--accent-blue));
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+}
+.primary-btn:active { transform: scale(0.97); }
+.glow-effect { box-shadow: 0 0 30px -5px rgba(74, 222, 128, 0.5); }
+
+#page-loading { justify-content: center; }
+.pulse-ring {
+    width: 60px; height: 60px; border-radius: 50%;
+    border: 4px solid var(--accent-blue); border-top-color: var(--accent-neon);
+    animation: spin 1s linear infinite; margin: 0 auto 30px;
+    box-shadow: 0 0 30px -10px var(--accent-blue);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-family: 'Montserrat', 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 1.4rem; line-height: 1.4; }
+
+/* --- 결과 페이지 (이미지 최대화 & 원본 화질 유지) --- */
+.result-layout {
+    justify-content: flex-start;
+    padding: 25px 20px 30px;
+    height: 100%; display: flex; flex-direction: column;
+}
+
+.image-frame-wrapper {
+    flex: 1 1 auto;
+    display: flex; justify-content: center; align-items: center;
+    width: 100%; min-height: 0; margin-bottom: 15px;
+}
+
+#result-img {
+    max-width: 100%;
+    max-height: 70vh; /* 화면의 70%까지 크게 보여줌 */
+    width: auto; height: auto;
+    object-fit: contain; /* 비율 유지 (찌그러짐 방지) */
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    display: block;
+}
+
+/* 버튼 영역 컴팩트 */
+.result-actions { flex: 0 0 auto; width: 100%; max-width: 300px; margin: 0 auto; }
+.button-group-sub { display: flex; gap: 10px; margin-bottom: 10px; }
+
+.dark-btn {
+    flex: 1; padding: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; 
+    font-weight: 600; background: rgba(255,255,255,0.05);
+    color: var(--text-light); cursor: pointer; font-size: 0.9rem;
+}
+
+.retry-btn {
+    width: 100%; padding: 12px;
+    border-radius: 12px; font-size: 0.95rem; font-weight: 600;
+    cursor: pointer;
+    background: rgba(15, 23, 42, 0.4); 
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-gray);
+    transition: all 0.3s ease;
+    display: flex; justify-content: center; align-items: center; gap: 6px;
+}
+.retry-btn:hover { border-color: var(--accent-neon); color: var(--accent-neon); background: rgba(74, 222, 128, 0.05); }

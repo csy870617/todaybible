@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2026 새해를 여는 하나님의 말씀</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2txfYR9bBueNgAx0Y3Chvy" crossorigin="anonymous"></script>
+
+    <script>
+        (function() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const targetUrl = location.href;
+            if (userAgent.match(/kakaotalk|naver|line|instagram|facebook|fbav|fbios/i)) {
+                if (userAgent.match(/android/i)) {
+                    location.href = 'intent://' + targetUrl.replace(/https?:\/\//i, '') + '#Intent;scheme=https;end';
+                } else if (userAgent.match(/iphone|ipad|ipod/i)) {
+                    if (userAgent.match(/kakaotalk/i)) {
+                        location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(targetUrl);
+                    }
+                }
+            }
+        })();
+    </script>
+</head>
+<body>
+    <div class="background-mesh"></div>
+
+    <div class="glass-container">
+        <section id="page-landing" class="page active">
+            <div class="header-content">
+                <p class="year-badge">2026 YEAR OF FAITH</p>
+                <h1 class="main-title">새해를 여는<br><span class="highlight">하나님의 말씀</span></h1>
+                <p class="sub-text">기도하는 마음으로<br>카드를 선택해주세요.</p>
+            </div>
+            
+            <div class="card-area">
+                <div class="card-3d">
+                    <div class="card-face">
+                        <span class="cross-icon">✝</span>
+                        <span class="card-label">WORD OF GOD</span>
+                    </div>
+                </div>
+            </div>
+
+            <button id="btn-draw" class="primary-btn glow-effect">말씀 뽑기 시작</button>
+        </section>
+
+        <section id="page-loading" class="page">
+            <div class="loading-wrapper">
+                <div class="pulse-ring"></div>
+                <p class="loading-text">당신을 위한<br><span class="highlight">말씀을 준비 중입니다...</span></p>
+            </div>
+        </section>
+
+        <section id="page-result" class="page result-layout">
+            <div class="image-frame-wrapper">
+                <img id="result-img" src="" alt="말씀 카드">
+            </div>
+            
+            <div class="result-actions">
+                <div class="button-group-sub">
+                    <button id="btn-download" class="action-btn dark-btn">⬇ 저장</button>
+                    <button id="btn-share" class="action-btn dark-btn">🔗 공유</button>
+                </div>
+                <button id="btn-retry" class="retry-btn">
+                    <span>↻ 다시 뽑기</span>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
