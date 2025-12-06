@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
-                const thumbUrl = new URL('thumbnail_1.png', SITE_URL).href;
+                const thumbUrl = new URL('thumbnail_2.png', SITE_URL).href;
                 Kakao.Share.sendDefault({
                     objectType: 'feed',
                     content: {
@@ -142,4 +142,5 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }
     });
+
 });
