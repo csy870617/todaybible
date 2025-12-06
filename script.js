@@ -20,10 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultImg = document.getElementById('result-img');
     const fullscreenModal = document.getElementById('fullscreen-modal');
     const fullscreenImg = document.getElementById('fullscreen-img');
+    const envelopeArea = document.querySelector('.card-3d'); // ✅ 봉투 요소 선택
 
     const totalCards = 105;
     let currentCardUrl = "";
 
+    // 화면 전환 함수
     function showPage(page) {
         [landingPage, loadingPage, resultPage].forEach(p => p.classList.remove('active'));
         window.scrollTo(0, 0);
@@ -32,10 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = 'auto';
     }
 
-    // 1. 뽑기
-    btnDraw.addEventListener('click', () => {
+    // ✅ [통합됨] 뽑기 동작 실행 함수 (버튼 & 봉투 클릭 공통)
+    const startDrawAction = () => {
         const envelope = document.querySelector('.card-3d');
-        envelope.classList.add('open');
+        
+        // 이미 열려있으면 중복 실행 방지
+        if(envelope.classList.contains('open')) return;
+
+        envelope.classList.add('open'); // 봉투 열림 애니메이션
 
         setTimeout(() => {
             showPage(loadingPage);
@@ -56,7 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 2000); 
         }, 800); 
-    });
+    };
+
+    // 1. 뽑기 이벤트 연결 (버튼 + 봉투)
+    btnDraw.addEventListener('click', startDrawAction);
+    envelopeArea.addEventListener('click', startDrawAction); // ✅ 봉투 터치 시에도 작동
 
     // 2. 다시 뽑기
     btnRetry.addEventListener('click', () => {
@@ -77,15 +87,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    // 4. 공유하기 (✅ 수정됨: 문구 없이 이미지만)
+    // 4. 공유하기
     btnShare.addEventListener('click', async () => {
         const shareUrl = window.location.href;
 
-        // [1단계] 모바일 기본 공유 (링크만 깔끔하게 전송)
+        // [1단계] 모바일 기본 공유
         if (navigator.share) {
             try {
                 await navigator.share({
-                    // title, text를 비워서 링크만 가게 유도하거나 최소한의 정보만 입력
                     url: shareUrl, 
                 });
                 return;
@@ -94,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // [2단계] 카카오톡 SDK 공유 (✅ 문구 제거, 썸네일 강조)
+        // [2단계] 카카오톡 SDK 공유
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
                 const thumbUrl = new URL('thumbnail.png', SITE_URL).href;
@@ -102,18 +111,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 Kakao.Share.sendDefault({
                     objectType: 'feed',
                     content: {
-                        // ✅ 제목과 설명을 공백(' ')으로 설정하여 숨김
                         title: ' ', 
                         description: ' ',
                         imageUrl: thumbUrl,
-                        // 이미지 클릭 시 이동할 링크
-                        link: { 
-                            mobileWebUrl: shareUrl, 
-                            webUrl: shareUrl 
-                        },
+                        link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                     },
-                    // ✅ 하단 버튼도 제거하여 이미지만 보이게 설정
-                    // (buttons 옵션을 아예 삭제하면 이미지만 뜸)
                 });
                 return;
             } catch (err) {}

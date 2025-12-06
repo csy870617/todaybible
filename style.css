@@ -8,11 +8,11 @@
     --accent-neon: #4ade80; 
     --accent-blue: #60a5fa;
     
-    /* 유리 질감 설정 (투명도 조절됨) */
+    /* 유리 질감 설정 */
     --glass-bg: rgba(15, 23, 42, 0.3);
     --glass-border: rgba(255, 255, 255, 0.1);
     
-    /* 봉투 컬러 (딥 레드 & 네온) */
+    /* 봉투 컬러 */
     --envelope-bg: #7f1d1d; 
     --envelope-glow: #ef4444; 
     --seal-gold: #fbbf24;
@@ -47,16 +47,13 @@ body {
 }
 @keyframes auroraMove { 0% { background-position: 0% 0%; } 100% { background-position: 100% 50%; } }
 
-/* =========================================
-   ✅ 메인 컨테이너 (박스)
-   ========================================= */
+/* 메인 컨테이너 */
 .glass-container {
     width: 90%; 
     max-width: 450px; 
     min-height: 650px; 
     height: auto;
     
-    /* 내부 컨텐츠 중앙 정렬 */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -76,14 +73,12 @@ body {
     margin: 40px auto;
 }
 
-/* =========================================
-   ✅ 페이지 공통 스타일
-   ========================================= */
+/* 페이지 공통 스타일 */
 .page {
-    display: none; /* 기본 숨김 */
+    display: none; 
     width: 100%; 
     height: 100%;
-    flex: 1; /* 남은 공간 차지 */
+    flex: 1;
     padding: 50px 25px; 
     
     flex-direction: column;
@@ -94,7 +89,6 @@ body {
     animation: fadeIn 0.6s ease-out;
 }
 
-/* 활성화될 때만 보임 (flex) */
 .page.active { display: flex; }
 
 @keyframes fadeIn {
@@ -116,7 +110,6 @@ body {
 .main-title { font-family: 'Montserrat', 'Noto Sans KR', sans-serif; font-size: 2.2rem; font-weight: 800; line-height: 1.2; margin: 0 0 10px 0; letter-spacing: -1px; }
 .sub-text { color: var(--text-gray); font-size: 1rem; line-height: 1.6; }
 
-/* 봉투 영역 (간격 넓힘) */
 .card-area { perspective: 1000px; margin: 60px 0; }
 
 /* 힙한 붉은 봉투 스타일 */
@@ -129,7 +122,9 @@ body {
     display: flex; justify-content: center; align-items: center;
     box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 25px rgba(220, 38, 38, 0.4); 
     animation: floatCard 4s ease-in-out infinite;
-    overflow: visible; 
+    overflow: visible;
+    /* ✅ [추가됨] 클릭 가능하다는 표시 */
+    cursor: pointer; 
 }
 
 /* 봉투 덮개 */
@@ -156,7 +151,7 @@ body {
     transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-/* 봉투 열림 상태 (.open 클래스) */
+/* 봉투 열림 상태 */
 .card-3d.open .envelope-flap { transform: rotateX(180deg); z-index: 0; }
 .card-3d.open .envelope-seal { opacity: 0; transform: scale(1.5); }
 
@@ -175,16 +170,35 @@ body {
 .glow-effect { box-shadow: 0 0 30px -5px rgba(74, 222, 128, 0.5); }
 
 
-/* --- 2. 로딩 화면 (Loading) : 3D 네온 북 --- */
+/* --- 2. 로딩 화면 (책 애니메이션 - Safe Version) --- */
 #page-loading { justify-content: center; height: 100%; } 
 .loading-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; }
 
+.book-shelf {
+    position: relative;
+    width: 60px; height: 40px; margin: 0 auto 40px;
+}
+.book-container {
+    position: relative; width: 100%; height: 100%;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    box-shadow: 0 0 15px rgba(96, 165, 250, 0.5); 
+}
+.book-page {
+    position: absolute; top: 0; right: 0; width: 50%; height: 100%;
+    background: #fff; border: 1px solid #e2e8f0;
+    transform-origin: left center; 
+    animation: flipSafe 1.5s infinite ease-in-out;
+}
+.book-page:nth-child(1) { animation-delay: 0s; z-index: 3; }
+.book-page:nth-child(2) { animation-delay: 0.3s; z-index: 2; }
+.book-page:nth-child(3) { animation-delay: 0.6s; z-index: 1; }
 
-@keyframes pageFlip {
-    0% { transform: rotateY(0deg); background: linear-gradient(to right, rgba(255,255,255,0.8), rgba(255,255,255,0.3)); }
-    15% { background: linear-gradient(to right, #fff, #60a5fa); box-shadow: 0 0 25px rgba(96, 165, 250, 0.8); }
-    50% { transform: rotateY(-180deg); background: linear-gradient(to left, rgba(255,255,255,0.1), rgba(255,255,255,0)); opacity: 0.6; }
-    100% { transform: rotateY(-180deg); opacity: 0; }
+@keyframes flipSafe {
+    0% { transform: perspective(600px) rotateY(0deg); background-color: #fff; opacity: 1; }
+    50% { transform: perspective(600px) rotateY(-180deg); background-color: #93c5fd; opacity: 0.8; }
+    100% { transform: perspective(600px) rotateY(-180deg); opacity: 0; }
 }
 
 .loading-text { font-family: 'Montserrat', 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 1.4rem; line-height: 1.4; }
@@ -192,8 +206,9 @@ body {
 
 /* --- 3. 결과 화면 (Result) --- */
 .result-layout {
-    /* .page의 기본 중앙 정렬을 따름 */
     flex-direction: column;
+    justify-content: center; 
+    align-items: center;     
     height: 100%;
 }
 
@@ -214,7 +229,6 @@ body {
     display: block;
     min-width: 100px; min-height: 100px;
 }
-/* 이미지 로딩 전 숨김 */
 #result-img[src=""] { display: none; }
 
 .result-actions { 
@@ -292,83 +306,3 @@ body {
     display: block;
 }
 .fullscreen-modal.active img { transform: scale(1); }
-
-/* =========================================
-   ✅ [수정됨] 오류 없는 책 애니메이션 (Safe Version)
-   ========================================= */
-
-/* 로딩 화면 레이아웃 */
-#page-loading { justify-content: center; height: 100%; }
-.loading-wrapper { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: center; 
-    height: 100%; 
-}
-
-/* 책 전체 컨테이너 */
-.book-shelf {
-    position: relative;
-    width: 60px;
-    height: 40px;
-    margin: 0 auto 40px;
-    /* 3D 효과 제거하고 평면 애니메이션으로 안정성 확보 */
-}
-
-.book-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    box-shadow: 0 0 15px rgba(96, 165, 250, 0.5); /* 푸른 네온 빛 */
-}
-
-/* 책 페이지 스타일 */
-.book-page {
-    position: absolute;
-    top: 0;
-    right: 0; /* 오른쪽 끝 기준 */
-    width: 50%; /* 책의 절반 크기 */
-    height: 100%;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    transform-origin: left center; /* 왼쪽(책등)을 축으로 회전 */
-    
-    /* 애니메이션 설정 */
-    animation: flipSafe 1.5s infinite ease-in-out;
-}
-
-/* 페이지별 시간차 */
-.book-page:nth-child(1) { animation-delay: 0s; z-index: 3; }
-.book-page:nth-child(2) { animation-delay: 0.3s; z-index: 2; }
-.book-page:nth-child(3) { animation-delay: 0.6s; z-index: 1; }
-
-/* ✅ [핵심] 페이지 넘김 애니메이션 (단순화하여 오류 방지) */
-@keyframes flipSafe {
-    0% {
-        transform: perspective(600px) rotateY(0deg);
-        background-color: #fff;
-        opacity: 1;
-    }
-    50% {
-        transform: perspective(600px) rotateY(-180deg);
-        background-color: #93c5fd; /* 넘길 때 살짝 파랗게 */
-        opacity: 0.8;
-    }
-    100% {
-        transform: perspective(600px) rotateY(-180deg);
-        opacity: 0; /* 넘어가면서 사라짐 */
-    }
-}
-
-/* 로딩 텍스트 */
-.loading-text { 
-    font-family: 'Montserrat', 'Noto Sans KR', sans-serif; 
-    font-weight: 700; 
-    font-size: 1.4rem; 
-    line-height: 1.4; 
-    color: #f8fafc;
-}
