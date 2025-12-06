@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. 설정
     const KAKAO_API_KEY = '6c23c364b1865ae078131725d071c841'; 
     const SITE_URL = 'https://csy870617.github.io/todaybible/';
 
+    // 2. 카카오 SDK 초기화
     if (typeof Kakao !== 'undefined') {
         if (!Kakao.isInitialized()) {
             try { Kakao.init(KAKAO_API_KEY); } catch (e) {}
@@ -22,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalCards = 105;
     let currentCardUrl = "";
 
+    // 화면 전환 함수
     function showPage(page) {
         [landingPage, loadingPage, resultPage].forEach(p => p.classList.remove('active'));
         window.scrollTo(0, 0);
@@ -68,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    // 4. 공유하기 (✅ 문구 삭제, 썸네일 텍스트 수정)
+    // 4. 공유하기 (✅ 카카오톡 메시지 내용 수정)
     btnShare.addEventListener('click', async () => {
         const shareUrl = window.location.href;
 
@@ -76,9 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (navigator.share) {
             try {
                 await navigator.share({
-                    // title은 일부 앱에서 무시됨
-                    title: '2026 새해를 여는 하나님의 말씀', 
-                    // text를 비워둠 (링크만 전송하기 위해)
+                    title: '2026 새해 하나님의 말씀 뽑기',
                     url: shareUrl, 
                 });
                 return;
@@ -95,19 +96,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 Kakao.Share.sendDefault({
                     objectType: 'feed',
                     content: {
-                        title: '2026 새해를 여는 하나님의 말씀',
-                        // ✅ 요청하신 썸네일 문구
-                        description: '2026년 당신을 위한 말씀은 무엇인가요?', 
+                        // ✅ HTML 메타 태그와 동일한 제목/설명 사용
+                        title: '2026 새해 하나님의 말씀 뽑기',
+                        description: '새해를 시작하며 당신에게 주시는 하나님의 말씀을 지금 확인해보세요.',
                         imageUrl: logoUrl,
                         link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                     },
-                    buttons: [{ title: '말씀 확인하기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
+                    buttons: [{ title: '말씀 뽑으러 가기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
                 });
                 return;
             } catch (err) {}
         }
 
-        // [3단계] 클립보드 복사 (오직 주소만 복사)
+        // [3단계] 클립보드 복사
         try {
             await navigator.clipboard.writeText(shareUrl);
             alert('주소가 복사되었습니다.');

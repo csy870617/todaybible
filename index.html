@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2026 새해를 여는 하나님의 말씀</title>
+    <title>2026 새해 하나님의 말씀 뽑기</title>
     
     <meta property="og:type" content="website">
-    <meta property="og:title" content="2026 새해를 여는 하나님의 말씀">
-    <meta property="og:description" content="2026년 당신을 위한 말씀은 무엇인가요?">
+    <meta property="og:site_name" content="2026 새해 말씀 뽑기">
+    <meta property="og:title" content="2026 새해 하나님의 말씀 뽑기">
+    <meta property="og:description" content="새해를 시작하며 당신에게 주시는 하나님의 말씀을 지금 확인해보세요.">
     <meta property="og:image" content="https://csy870617.github.io/todaybible/logo.png">
+    <meta property="og:image:width" content="800">
+    <meta property="og:image:height" content="400">
     <meta property="og:url" content="https://csy870617.github.io/todaybible/">
 
     <link rel="stylesheet" href="style.css">
@@ -22,13 +25,22 @@
         (function() {
             const userAgent = navigator.userAgent.toLowerCase();
             const targetUrl = location.href;
+            // 카카오톡 인앱 브라우저 등에서 외부 브라우저로 열기 유도
             if (userAgent.match(/kakaotalk|naver|line|instagram|facebook|fbav|fbios/i)) {
+                // 안드로이드의 경우 intent 사용
                 if (userAgent.match(/android/i)) {
+                    // intent 스킴을 사용하여 크롬 등으로 열기 시도
+                    // package 명시를 제거하여 브라우저 선택창을 유도하거나 기본 브라우저로 열리게 함
                     location.href = 'intent://' + targetUrl.replace(/https?:\/\//i, '') + '#Intent;scheme=https;end';
-                } else if (userAgent.match(/iphone|ipad|ipod/i)) {
+                } 
+                // iOS의 경우 (특히 카카오톡)
+                else if (userAgent.match(/iphone|ipad|ipod/i)) {
                     if (userAgent.match(/kakaotalk/i)) {
+                        // 카카오톡 에서는 외부 브라우저 호출 스킴 사용
                         location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(targetUrl);
                     }
+                    // 다른 iOS 인앱 브라우저에 대한 처리가 필요하다면 여기에 추가
+                    // 예: 안내 메시지 표시 등
                 }
             }
         })();
