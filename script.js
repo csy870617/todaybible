@@ -1,5 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. 설정
     const KAKAO_API_KEY = '6c23c364b1865ae078131725d071c841'; 
+    const SITE_URL = 'https://csy870617.github.io/todaybible/';
+
+    // 2. 카카오 SDK 초기화
     if (typeof Kakao !== 'undefined') {
         if (!Kakao.isInitialized()) {
             try { Kakao.init(KAKAO_API_KEY); } catch (e) {}
@@ -55,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showPage(landingPage);
     });
 
-    // 3. 저장하기
+    // 3. 저장하기 (원본 이미지 다운로드)
     btnDownload.addEventListener('click', () => {
         const link = document.createElement('a');
         link.href = currentCardUrl;
@@ -66,55 +70,66 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    // 4. 공유하기 (수정됨: 이미지 + 문구 + URL)
+    // 4. 공유하기 (✅ 수정됨: 문구 + 링크만 깔끔하게 공유)
     btnShare.addEventListener('click', async () => {
         const shareTitle = '2026 새해를 여는 하나님의 말씀';
+        const shareText = '당신의 2026년 새해를 여는 말씀은 무엇인가요?';
         const shareUrl = window.location.href;
-        
-        // ✅ 문구와 URL을 합칩니다 (가장 확실한 방법)
-        const shareText = '당신의 2026년 새해를 여는 말씀은 무엇인가요?\n' + shareUrl;
 
-        try {
-            const response = await fetch(currentCardUrl);
-            const blob = await response.blob();
-            const file = new File([blob], '2026_word.jpg', { type: 'image/jpeg' });
-
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        // --- [1단계] 모바일 기본 공유 (네이티브) ---
+        // 카톡, 문자, 인스타DM 등 설치된 앱 목록이 뜹니다.
+        if (navigator.share) {
+            try {
                 await navigator.share({
-                    files: [file],
                     title: shareTitle,
-                    text: shareText, // 여기에 URL이 포함됨
+                    text: shareText,
+                    url: shareUrl,
                 });
-                return;
+                return; // 공유 성공 시 종료
+            } catch (err) {
+                // 사용자가 취소했거나 에러 발생 시 다음 단계(카톡 SDK)로 넘어감
+                console.log('네이티브 공유 취소/실패');
             }
-        } catch (error) {
-            console.log('파일 공유 불가, 대체 수단 실행');
         }
 
-        // 카카오톡 공유
+        // --- [2단계] 카카오톡 SDK 공유 (PC 등 네이티브 공유 불가능할 때) ---
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
-                const fullImageUrl = new URL(currentCardUrl, window.location.href).href;
+                // 로고 이미지 경로 (logo.png)
+                const logoUrl = new URL('logo.png', SITE_URL).href;
+
                 Kakao.Share.sendDefault({
                     objectType: 'feed',
                     content: {
                         title: shareTitle,
-                        description: '당신의 2026년 새해를 여는 말씀은 무엇인가요?', // 카톡은 URL 버튼이 따로 있어서 문구만
-                        imageUrl: fullImageUrl,
-                        link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
+                        description: shareText,
+                        imageUrl: logoUrl, // 썸네일은 로고로 고정
+                        link: {
+                            mobileWebUrl: shareUrl,
+                            webUrl: shareUrl,
+                        },
                     },
-                    buttons: [{ title: '말씀 뽑기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
+                    buttons: [
+                        {
+                            title: '말씀 뽑기',
+                            link: {
+                                mobileWebUrl: shareUrl,
+                                webUrl: shareUrl,
+                            },
+                        },
+                    ],
                 });
                 return;
             } catch (err) {}
         }
 
-        // 클립보드 복사
+        // --- [3단계] 최후의 수단: 클립보드 복사 ---
         try {
-            await navigator.clipboard.writeText(shareUrl);
-            alert('주소가 복사되었습니다.\n당신의 2026년 새해를 여는 말씀은 무엇인가요?');
+            const textToCopy = `${shareText}\n${shareUrl}`;
+            await navigator.clipboard.writeText(textToCopy);
+            alert('주소가 복사되었습니다.\n원하시는 곳에 붙여넣기 하세요.');
         } catch (err) {
-            alert('공유할 수 없습니다.');
+            alert('공유 기능을 사용할 수 없습니다.');
         }
     });
 
