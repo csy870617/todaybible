@@ -77,19 +77,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    // 4. 공유하기
+    // 4. 공유하기 (✅ 수정됨: 문구 없이 이미지만)
     btnShare.addEventListener('click', async () => {
-        const shareText = '당신의 말씀은 무엇인가요?';
         const shareUrl = window.location.href;
-        const finalShareText = `${shareText}\n${shareUrl}`;
 
-        // [1단계] 모바일 기본 공유
+        // [1단계] 모바일 기본 공유 (링크만 깔끔하게 전송)
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: '2026 새해를 여는 하나님의 말씀',
-                    text: shareText,
-                    url: shareUrl,
+                    // title, text를 비워서 링크만 가게 유도하거나 최소한의 정보만 입력
+                    url: shareUrl, 
                 });
                 return;
             } catch (err) {
@@ -97,21 +94,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // [2단계] 카카오톡 SDK 공유
+        // [2단계] 카카오톡 SDK 공유 (✅ 문구 제거, 썸네일 강조)
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
-                // ✅ 썸네일 이미지 변경: thumbnail.png
                 const thumbUrl = new URL('thumbnail.png', SITE_URL).href;
 
                 Kakao.Share.sendDefault({
                     objectType: 'feed',
                     content: {
-                        title: '2026 새해를 여는 하나님의 말씀',
-                        description: '2026년 당신을 위한 말씀은 무엇인가요?',
-                        imageUrl: thumbUrl, 
-                        link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
+                        // ✅ 제목과 설명을 공백(' ')으로 설정하여 숨김
+                        title: ' ', 
+                        description: ' ',
+                        imageUrl: thumbUrl,
+                        // 이미지 클릭 시 이동할 링크
+                        link: { 
+                            mobileWebUrl: shareUrl, 
+                            webUrl: shareUrl 
+                        },
                     },
-                    buttons: [{ title: '말씀 확인하기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
+                    // ✅ 하단 버튼도 제거하여 이미지만 보이게 설정
+                    // (buttons 옵션을 아예 삭제하면 이미지만 뜸)
                 });
                 return;
             } catch (err) {}
@@ -119,8 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // [3단계] 클립보드 복사
         try {
-            await navigator.clipboard.writeText(finalShareText);
-            alert('주소가 복사되었습니다.\n원하시는 곳에 붙여넣기 하세요.');
+            await navigator.clipboard.writeText(shareUrl);
+            alert('주소가 복사되었습니다.');
         } catch (err) {
             alert('공유 기능을 사용할 수 없습니다.');
         }
