@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. 설정
     const KAKAO_API_KEY = '6c23c364b1865ae078131725d071c841'; 
     const SITE_URL = 'https://csy870617.github.io/todaybible/';
 
+    // 2. 카카오 SDK 초기화
     if (typeof Kakao !== 'undefined') {
         if (!Kakao.isInitialized()) {
             try { Kakao.init(KAKAO_API_KEY); } catch (e) {}
@@ -18,8 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultImg = document.getElementById('result-img');
     const fullscreenModal = document.getElementById('fullscreen-modal');
     const fullscreenImg = document.getElementById('fullscreen-img');
-    
-    // ✅ [수정됨] 움직이는 봉투 대신, 봉투가 들어있는 '영역'을 선택 (터치 오류 해결 핵심)
     const envelopeArea = document.querySelector('.card-area'); 
 
     const totalCards = 105;
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800); 
     };
 
-    // ✅ 이벤트 연결 (버튼 클릭 + 봉투 영역 터치)
+    // 이벤트 연결
     btnDraw.addEventListener('click', startDrawAction);
     envelopeArea.addEventListener('click', startDrawAction); 
 
@@ -87,18 +87,24 @@ document.addEventListener('DOMContentLoaded', () => {
     btnShare.addEventListener('click', async () => {
         const shareUrl = window.location.href;
 
+        // [1단계] 모바일 기본 공유
         if (navigator.share) {
             try {
-                await navigator.share({ url: shareUrl });
+                await navigator.share({
+                    url: shareUrl, 
+                });
                 return;
             } catch (err) {
                 console.log('네이티브 공유 취소/실패');
             }
         }
 
+        // [2단계] 카카오톡 SDK 공유
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
-                const thumbUrl = new URL('thumbnail_2.png', SITE_URL).href;
+                // ✅ [수정됨] 썸네일 이미지: thumbnail_3.png
+                const thumbUrl = new URL('thumbnail_3.png', SITE_URL).href;
+
                 Kakao.Share.sendDefault({
                     objectType: 'feed',
                     content: {
@@ -112,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (err) {}
         }
 
+        // [3단계] 클립보드 복사
         try {
             await navigator.clipboard.writeText(shareUrl);
             alert('주소가 복사되었습니다.');
@@ -142,5 +149,4 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }
     });
-
 });
