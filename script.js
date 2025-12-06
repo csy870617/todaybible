@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo(0, 0);
         page.classList.add('active');
         
-        // 페이지 전환 시 모달이 켜져있다면 닫기 (안전장치)
+        // 페이지 전환 시 모달이 켜져있다면 닫기
         fullscreenModal.classList.remove('active');
         document.body.style.overflow = 'auto';
     }
@@ -75,7 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. 공유하기
     btnShare.addEventListener('click', async () => {
-        const shareText = '2026년 당신을 위한 하나님의 말씀은 무엇인가요?';
+        // ✅ 문구 수정됨
+        const shareText = '당신의 말씀은 무엇인가요?';
         const shareUrl = window.location.href;
         const finalShareText = `${shareText}\n${shareUrl}`;
 
@@ -121,37 +122,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =========================================
-    // ✅ [수정됨] 전체화면 & 뒤로가기 제어 로직
+    // ✅ 전체화면 & 뒤로가기 제어 로직
     // =========================================
 
-    // 모달 닫기 함수
     const closeModal = () => {
         fullscreenModal.classList.remove('active');
         document.body.style.overflow = 'auto';
     };
 
-    // 1. 이미지 클릭 시 -> 전체화면 열기 + 히스토리 추가
+    // 1. 이미지 클릭 시 -> 열기 + 히스토리 추가
     resultImg.addEventListener('click', () => {
         fullscreenImg.src = currentCardUrl;
         fullscreenModal.classList.add('active');
         document.body.style.overflow = 'hidden';
-        
-        // 🚀 브라우저 히스토리에 'modal' 상태 추가 (가짜 페이지 이동 효과)
         history.pushState({ modal: true }, null, "");
     });
 
-    // 2. 전체화면 모달 클릭 시 -> 닫기 (뒤로가기 실행)
+    // 2. 모달 클릭 시 -> 닫기 (뒤로가기 실행)
     fullscreenModal.addEventListener('click', () => {
-        // 직접 닫는 대신 뒤로가기를 실행하면 -> 아래 'popstate' 이벤트가 감지해서 닫아줌
         history.back();
     });
 
-    // 3. 브라우저 뒤로가기 버튼 감지 ('popstate' 이벤트)
+    // 3. 뒤로가기 감지
     window.addEventListener('popstate', () => {
-        // 뒤로가기를 눌렀을 때 모달이 열려있다면 닫기
         if (fullscreenModal.classList.contains('active')) {
             closeModal();
-            // (참고: 뒤로가기를 누르면 히스토리는 자동으로 하나 빠지므로 추가 작업 불필요)
         }
     });
 });
