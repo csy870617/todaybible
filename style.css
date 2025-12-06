@@ -8,7 +8,7 @@
     --accent-neon: #4ade80; 
     --accent-blue: #60a5fa;
     
-    /* 유리 질감 설정 */
+    /* 유리 질감 설정 (투명도 조절됨) */
     --glass-bg: rgba(15, 23, 42, 0.3);
     --glass-border: rgba(255, 255, 255, 0.1);
     
@@ -47,13 +47,16 @@ body {
 }
 @keyframes auroraMove { 0% { background-position: 0% 0%; } 100% { background-position: 100% 50%; } }
 
-/* 메인 박스 스타일 */
+/* =========================================
+   ✅ 메인 컨테이너 (박스)
+   ========================================= */
 .glass-container {
     width: 90%; 
     max-width: 450px; 
     min-height: 650px; 
     height: auto;
     
+    /* 내부 컨텐츠 중앙 정렬 */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -73,12 +76,14 @@ body {
     margin: 40px auto;
 }
 
-/* 페이지 공통 스타일 */
+/* =========================================
+   ✅ 페이지 공통 스타일
+   ========================================= */
 .page {
     display: none; /* 기본 숨김 */
     width: 100%; 
     height: 100%;
-    flex: 1;
+    flex: 1; /* 남은 공간 차지 */
     padding: 50px 25px; 
     
     flex-direction: column;
@@ -89,7 +94,7 @@ body {
     animation: fadeIn 0.6s ease-out;
 }
 
-/* 활성화될 때만 보임 */
+/* 활성화될 때만 보임 (flex) */
 .page.active { display: flex; }
 
 @keyframes fadeIn {
@@ -103,7 +108,7 @@ body {
     -webkit-background-clip: text; background-clip: text;
 }
 
-/* --- 1. 시작 화면 스타일 --- */
+/* --- 1. 시작 화면 (Landing) --- */
 #page-landing { gap: 20px; justify-content: center; }
 
 .header-content { margin-bottom: 10px; }
@@ -111,9 +116,10 @@ body {
 .main-title { font-family: 'Montserrat', 'Noto Sans KR', sans-serif; font-size: 2.2rem; font-weight: 800; line-height: 1.2; margin: 0 0 10px 0; letter-spacing: -1px; }
 .sub-text { color: var(--text-gray); font-size: 1rem; line-height: 1.6; }
 
+/* 봉투 영역 (간격 넓힘) */
 .card-area { perspective: 1000px; margin: 60px 0; }
 
-/* 붉은 봉투 스타일 */
+/* 힙한 붉은 봉투 스타일 */
 .card-3d.envelope-red {
     width: 180px; height: 120px;
     background: linear-gradient(135deg, #991b1b, #7f1d1d);
@@ -150,7 +156,7 @@ body {
     transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-/* 봉투 열림 상태 */
+/* 봉투 열림 상태 (.open 클래스) */
 .card-3d.open .envelope-flap { transform: rotateX(180deg); z-index: 0; }
 .card-3d.open .envelope-seal { opacity: 0; transform: scale(1.5); }
 
@@ -169,42 +175,10 @@ body {
 .glow-effect { box-shadow: 0 0 30px -5px rgba(74, 222, 128, 0.5); }
 
 
-/* --- 2. 로딩 화면 스타일 (3D 책 애니메이션) --- */
+/* --- 2. 로딩 화면 (Loading) : 3D 네온 북 --- */
 #page-loading { justify-content: center; height: 100%; } 
 .loading-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; }
 
-.neon-book {
-    position: relative;
-    width: 80px; height: 60px;
-    margin: 0 auto 40px; 
-    perspective: 1200px; 
-    transform-style: preserve-3d;
-}
-
-.neon-book .page {
-    position: absolute; top: 0; left: 40px; width: 40px; height: 60px;
-    background: linear-gradient(to right, rgba(255,255,255,0.8), rgba(255,255,255,0.3));
-    border: 1px solid rgba(255,255,255,0.4); 
-    border-radius: 0 5px 5px 0;
-    transform-origin: left center;
-    box-shadow: 0 0 15px rgba(96, 165, 250, 0.4); 
-}
-
-/* 페이지 넘김 애니메이션 */
-.neon-book .page:nth-child(1) { animation: pageFlip 2s infinite ease-in-out 0s; z-index: 4; }
-.neon-book .page:nth-child(2) { animation: pageFlip 2s infinite ease-in-out 0.3s; z-index: 3; }
-.neon-book .page:nth-child(3) { animation: pageFlip 2s infinite ease-in-out 0.6s; z-index: 2; }
-.neon-book .page:nth-child(4) { animation: pageFlip 2s infinite ease-in-out 0.9s; z-index: 1; }
-
-.neon-book .cover {
-    position: absolute; top: 0; left: 0; width: 80px; height: 60px;
-    background: rgba(255, 255, 255, 0.05); 
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 4px; 
-    transform: rotateX(20deg) translateZ(-5px);
-    box-shadow: 0 20px 30px rgba(0,0,0,0.5); 
-    z-index: 0;
-}
 
 @keyframes pageFlip {
     0% { transform: rotateY(0deg); background: linear-gradient(to right, rgba(255,255,255,0.8), rgba(255,255,255,0.3)); }
@@ -216,11 +190,10 @@ body {
 .loading-text { font-family: 'Montserrat', 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 1.4rem; line-height: 1.4; }
 
 
-/* --- 3. 결과 화면 스타일 --- */
+/* --- 3. 결과 화면 (Result) --- */
 .result-layout {
+    /* .page의 기본 중앙 정렬을 따름 */
     flex-direction: column;
-    justify-content: center; 
-    align-items: center;     
     height: 100%;
 }
 
@@ -241,6 +214,7 @@ body {
     display: block;
     min-width: 100px; min-height: 100px;
 }
+/* 이미지 로딩 전 숨김 */
 #result-img[src=""] { display: none; }
 
 .result-actions { 
@@ -318,3 +292,83 @@ body {
     display: block;
 }
 .fullscreen-modal.active img { transform: scale(1); }
+
+/* =========================================
+   ✅ [수정됨] 오류 없는 책 애니메이션 (Safe Version)
+   ========================================= */
+
+/* 로딩 화면 레이아웃 */
+#page-loading { justify-content: center; height: 100%; }
+.loading-wrapper { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    height: 100%; 
+}
+
+/* 책 전체 컨테이너 */
+.book-shelf {
+    position: relative;
+    width: 60px;
+    height: 40px;
+    margin: 0 auto 40px;
+    /* 3D 효과 제거하고 평면 애니메이션으로 안정성 확보 */
+}
+
+.book-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    box-shadow: 0 0 15px rgba(96, 165, 250, 0.5); /* 푸른 네온 빛 */
+}
+
+/* 책 페이지 스타일 */
+.book-page {
+    position: absolute;
+    top: 0;
+    right: 0; /* 오른쪽 끝 기준 */
+    width: 50%; /* 책의 절반 크기 */
+    height: 100%;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    transform-origin: left center; /* 왼쪽(책등)을 축으로 회전 */
+    
+    /* 애니메이션 설정 */
+    animation: flipSafe 1.5s infinite ease-in-out;
+}
+
+/* 페이지별 시간차 */
+.book-page:nth-child(1) { animation-delay: 0s; z-index: 3; }
+.book-page:nth-child(2) { animation-delay: 0.3s; z-index: 2; }
+.book-page:nth-child(3) { animation-delay: 0.6s; z-index: 1; }
+
+/* ✅ [핵심] 페이지 넘김 애니메이션 (단순화하여 오류 방지) */
+@keyframes flipSafe {
+    0% {
+        transform: perspective(600px) rotateY(0deg);
+        background-color: #fff;
+        opacity: 1;
+    }
+    50% {
+        transform: perspective(600px) rotateY(-180deg);
+        background-color: #93c5fd; /* 넘길 때 살짝 파랗게 */
+        opacity: 0.8;
+    }
+    100% {
+        transform: perspective(600px) rotateY(-180deg);
+        opacity: 0; /* 넘어가면서 사라짐 */
+    }
+}
+
+/* 로딩 텍스트 */
+.loading-text { 
+    font-family: 'Montserrat', 'Noto Sans KR', sans-serif; 
+    font-weight: 700; 
+    font-size: 1.4rem; 
+    line-height: 1.4; 
+    color: #f8fafc;
+}
