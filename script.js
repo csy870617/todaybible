@@ -1,49 +1,41 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ✅ 사용자 님의 카카오 자바스크립트 키
+    // ✅ 카카오 키 적용 완료
     const KAKAO_API_KEY = '6c23c364b1865ae078131725d071c841'; 
-
-    // 카카오 SDK 초기화
     if (typeof Kakao !== 'undefined') {
         if (!Kakao.isInitialized()) {
-            try {
-                Kakao.init(KAKAO_API_KEY);
-            } catch (e) {
-                console.warn('Kakao SDK Init Failed:', e);
-            }
+            try { Kakao.init(KAKAO_API_KEY); } catch (e) {}
         }
     }
 
     const landingPage = document.getElementById('page-landing');
     const loadingPage = document.getElementById('page-loading');
     const resultPage = document.getElementById('page-result');
-
     const btnDraw = document.getElementById('btn-draw');
     const btnRetry = document.getElementById('btn-retry');
     const btnDownload = document.getElementById('btn-download');
     const btnShare = document.getElementById('btn-share');
     const resultImg = document.getElementById('result-img');
+    const fullscreenModal = document.getElementById('fullscreen-modal');
+    const fullscreenImg = document.getElementById('fullscreen-img');
 
-    // 카드 총 개수
     const totalCards = 105;
     let currentCardUrl = "";
 
     function showPage(page) {
         [landingPage, loadingPage, resultPage].forEach(p => p.classList.remove('active'));
         window.scrollTo(0, 0);
-        setTimeout(() => page.classList.add('active'), 50);
+        page.classList.add('active');
+        fullscreenModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
     }
 
-    // 1. 뽑기 버튼
+    // 1. 뽑기 (001.JPG 규칙 적용)
     btnDraw.addEventListener('click', () => {
         showPage(loadingPage);
         setTimeout(() => {
             const randomIndex = Math.floor(Math.random() * totalCards) + 1;
-            
-            // 🚨 [핵심 수정] 숫자를 3자리 문자열로 변환 (예: 1 -> "001", 15 -> "015")
             const formattedNum = String(randomIndex).padStart(3, '0');
-            
-            // 파일명 규칙 적용: 001.JPG ~ 105.JPG
-            currentCardUrl = `cards/${formattedNum}.JPG`;
+            currentCardUrl = `cards/${formattedNum}.JPG`; // 대문자 .JPG
             
             const imgLoader = new Image();
             imgLoader.src = currentCardUrl;
@@ -75,50 +67,66 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    // 4. 공유하기
+    // 4. 공유하기 (업그레이드: 이미지 파일 자체 공유 + 문구)
     btnShare.addEventListener('click', async () => {
-        const shareData = {
-            title: '2026 새해를 여는 하나님의 말씀',
-            text: '새해 저에게 주신 말씀을 확인해보세요.',
-            url: window.location.href,
-        };
+        const shareTitle = '2026 새해를 여는 하나님의 말씀';
+        const shareText = '당신의 2026년 새해를 여는 말씀은 무엇인가요?';
+        const shareUrl = window.location.href;
 
-        const fullImageUrl = new URL(currentCardUrl, window.location.href).href;
+        try {
+            // 이미지 파일을 Fetch -> Blob -> File 객체로 변환
+            const response = await fetch(currentCardUrl);
+            const blob = await response.blob();
+            const file = new File([blob], '2026_word.jpg', { type: 'image/jpeg' });
 
-        // [1순위] 카카오톡
+            // 네이티브 공유 (파일 공유) 시도
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: shareTitle,
+                    text: shareText, // 문구 포함
+                });
+                return;
+            }
+        } catch (error) {
+            console.log('파일 공유 지원 안 함, 대체 수단 실행');
+        }
+
+        // 실패 시 카카오톡 링크 공유
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
+                const fullImageUrl = new URL(currentCardUrl, window.location.href).href;
                 Kakao.Share.sendDefault({
                     objectType: 'feed',
                     content: {
-                        title: shareData.title,
-                        description: shareData.text,
+                        title: shareTitle,
+                        description: shareText, // 문구 포함
                         imageUrl: fullImageUrl,
-                        link: {
-                            mobileWebUrl: shareData.url,
-                            webUrl: shareData.url,
-                        },
+                        link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                     },
-                    buttons: [{
-                        title: '말씀 뽑으러 가기',
-                        link: { mobileWebUrl: shareData.url, webUrl: shareData.url },
-                    }],
+                    buttons: [{ title: '말씀 뽑기', link: { mobileWebUrl: shareUrl, webUrl: shareUrl } }],
                 });
                 return;
             } catch (err) {}
         }
 
-        // [2순위] 기본 공유
-        if (navigator.share) {
-            try { await navigator.share(shareData); return; } catch (err) {}
-        }
-
-        // [3순위] 복사
+        // 최후의 수단: 링크 복사
         try {
-            await navigator.clipboard.writeText(window.location.href);
-            alert('주소가 복사되었습니다.');
+            await navigator.clipboard.writeText(shareUrl);
+            alert('주소가 복사되었습니다.\n' + shareText);
         } catch (err) {
-            alert('주소 복사 실패');
+            alert('공유할 수 없습니다.');
         }
+    });
+
+    // 전체화면 기능
+    resultImg.addEventListener('click', () => {
+        fullscreenImg.src = currentCardUrl;
+        fullscreenModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+    fullscreenModal.addEventListener('click', () => {
+        fullscreenModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
     });
 });

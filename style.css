@@ -15,14 +15,12 @@ body {
     font-family: 'Noto Sans KR', sans-serif;
     display: flex;
     justify-content: center;
-    align-items: center; /* 세로 중앙 정렬 */
-    /* ✅ 중요: 최소 높이를 화면 전체로 잡고, 내용이 많으면 늘어나게(auto) 설정 */
-    min-height: 100vh; 
-    padding: 20px 0; /* 상하 여백 추가 */
+    align-items: center; 
+    min-height: 100vh; /* 최소 높이 설정 */
+    padding: 20px 0;
     background-color: var(--bg-dark);
     color: var(--text-light);
-    /* ✅ 스크롤 허용 */
-    overflow-y: auto; 
+    overflow-y: auto; /* 스크롤 허용 */
     overflow-x: hidden;
 }
 
@@ -39,42 +37,31 @@ body {
 @keyframes auroraMove { 0% { background-position: 0% 0%; } 100% { background-position: 100% 50%; } }
 
 .glass-container {
-    width: 90%; /* 모바일 좌우 여백 확보 */
+    width: 90%; 
     max-width: 430px; 
-    /* ✅ 높이 고정 해제: 내용만큼 늘어남 */
-    height: auto; 
-    min-height: 500px; /* 너무 작아지지 않게 */
-    
+    height: auto; /* 내용에 따라 늘어남 */
+    min-height: 500px;
     background: var(--glass-bg);
     backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
     border: 1px solid var(--glass-border);
     border-radius: 30px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    
-    /* ✅ 내부 스크롤 문제 해결을 위해 flex 사용하지 않음 (내부 페이지가 flex 사용) */
     position: relative; 
-    margin: 20px auto; /* 상하 여백 */
+    margin: 20px auto;
     padding-bottom: 20px;
 }
 
-/* --- 페이지 전환 로직 변경 (중요!) --- */
+/* 페이지 전환 로직 */
 .page {
-    /* ✅ 안 보이는 페이지는 아예 공간 차지 안 함 */
     display: none; 
     width: 100%; 
     padding: 30px 20px; 
     flex-direction: column;
     align-items: center; 
     text-align: center;
-    
-    /* 애니메이션 효과 */
     animation: fadeIn 0.5s ease-out;
 }
-
-/* ✅ 활성화된 페이지만 보임 (flex로 배치) */
-.page.active { 
-    display: flex; 
-}
+.page.active { display: flex; }
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
@@ -88,7 +75,7 @@ body {
 }
 
 /* 랜딩 & 로딩 */
-#page-landing { justify-content: center; gap: 20px; min-height: 500px; } /* 최소 높이 확보 */
+#page-landing { justify-content: center; gap: 20px; min-height: 500px; }
 .header-content { margin-bottom: 10px; }
 .year-badge { font-family: 'Montserrat', sans-serif; font-size: 0.9rem; letter-spacing: 3px; color: var(--accent-neon); font-weight: 800; margin-bottom: 15px; opacity: 0.9; }
 .main-title { font-family: 'Montserrat', 'Noto Sans KR', sans-serif; font-size: 2.2rem; font-weight: 800; line-height: 1.2; margin: 0 0 10px 0; letter-spacing: -1px; }
@@ -129,12 +116,12 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-text { font-family: 'Montserrat', 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 1.4rem; line-height: 1.4; }
 
-/* --- 결과 페이지 --- */
+/* ✅ 결과 화면 레이아웃 (버튼 꽉 채우기 적용) */
 .result-layout {
     justify-content: flex-start;
-    padding: 20px;
-    /* ✅ 높이 제한 삭제: 이미지가 길면 스크롤 됨 */
+    padding: 20px; 
     height: auto; 
+    padding-bottom: 30px; 
 }
 
 .image-frame-wrapper {
@@ -145,37 +132,79 @@ body {
 
 #result-img {
     max-width: 100%;
-    /* ✅ 이미지가 너무 커서 화면을 뚫는 것 방지하되, 필요하면 스크롤 되도록 유연하게 */
-    /* width: 100%; -> 이걸 쓰면 원본 비율에 따라 엄청 길어질 수 있음 */
+    max-height: 60vh; /* 버튼 공간 확보를 위해 약간 줄임 */
     height: auto;
-    max-height: 75vh; /* 화면의 75% 정도만 차지하게 제한 (너무 길면 버튼이 안보이니까) */
-    
     object-fit: contain;
     border-radius: 12px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     display: block;
 }
 
-.result-actions { flex: 0 0 auto; width: 100%; max-width: 300px; margin: 0 auto; }
-.button-group-sub { display: flex; gap: 10px; margin-bottom: 10px; }
-
-.dark-btn {
-    flex: 1; padding: 12px;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px; 
-    font-weight: 600; background: rgba(255,255,255,0.05);
-    color: var(--text-light); cursor: pointer; font-size: 0.9rem;
+/* 버튼 영역: 꽉 찬 레이아웃 */
+.result-actions { 
+    flex: 0 0 auto; 
+    width: 100%; 
+    max-width: 100%; /* 너비 제한 해제 */
+    margin: 0; 
 }
 
+.button-row { 
+    display: flex; 
+    gap: 10px; 
+    margin-bottom: 10px; 
+    width: 100%;
+}
+
+/* 저장/공유 버튼 */
+.dark-btn {
+    flex: 1; /* 1:1 비율로 꽉 채움 */
+    padding: 18px 0;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px; 
+    font-weight: 700; 
+    background: rgba(255,255,255,0.08);
+    color: var(--text-light); 
+    cursor: pointer; 
+    font-size: 1rem;
+    display: flex; justify-content: center; align-items: center; gap: 8px;
+    transition: background 0.2s;
+}
+
+/* 공유 버튼 강조 스타일 */
+.highlight-btn {
+    background: rgba(96, 165, 250, 0.2); 
+    border-color: var(--accent-blue);
+    color: #fff;
+}
+
+/* 다시 뽑기 버튼 (전체 너비) */
 .retry-btn {
-    width: 100%; padding: 12px;
-    border-radius: 12px; font-size: 0.95rem; font-weight: 600;
+    width: 100%; 
+    padding: 18px 0;
+    border-radius: 16px; 
+    font-size: 1.1rem; 
+    font-weight: 700;
     cursor: pointer;
-    background: rgba(15, 23, 42, 0.4); 
+    background: rgba(15, 23, 42, 0.6); 
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     color: var(--text-gray);
     transition: all 0.3s ease;
-    display: flex; justify-content: center; align-items: center; gap: 6px;
+    display: flex; justify-content: center; align-items: center; gap: 8px;
 }
 .retry-btn:hover { border-color: var(--accent-neon); color: var(--accent-neon); background: rgba(74, 222, 128, 0.05); }
+
+/* 전체화면 모달 스타일 */
+.fullscreen-modal {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.95); z-index: 9999;
+    justify-content: center; align-items: center;
+    cursor: zoom-out; opacity: 0; transition: opacity 0.3s ease;
+}
+.fullscreen-modal.active { display: flex; opacity: 1; }
+.fullscreen-modal img {
+    max-width: 95%; max-height: 95%; object-fit: contain;
+    border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.8);
+    transform: scale(0.9); transition: transform 0.3s ease;
+}
+.fullscreen-modal.active img { transform: scale(1); }
