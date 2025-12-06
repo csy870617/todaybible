@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ✅ 카카오 키 적용 완료
     const KAKAO_API_KEY = '6c23c364b1865ae078131725d071c841'; 
     if (typeof Kakao !== 'undefined') {
         if (!Kakao.isInitialized()) {
@@ -29,13 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = 'auto';
     }
 
-    // 1. 뽑기 (001.JPG 규칙 적용)
+    // 1. 뽑기
     btnDraw.addEventListener('click', () => {
         showPage(loadingPage);
         setTimeout(() => {
             const randomIndex = Math.floor(Math.random() * totalCards) + 1;
             const formattedNum = String(randomIndex).padStart(3, '0');
-            currentCardUrl = `cards/${formattedNum}.JPG`; // 대문자 .JPG
+            currentCardUrl = `cards/${formattedNum}.JPG`; 
             
             const imgLoader = new Image();
             imgLoader.src = currentCardUrl;
@@ -67,32 +66,32 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    // 4. 공유하기 (업그레이드: 이미지 파일 자체 공유 + 문구)
+    // 4. 공유하기 (수정됨: 이미지 + 문구 + URL)
     btnShare.addEventListener('click', async () => {
         const shareTitle = '2026 새해를 여는 하나님의 말씀';
-        const shareText = '당신의 2026년 새해를 여는 말씀은 무엇인가요?';
         const shareUrl = window.location.href;
+        
+        // ✅ 문구와 URL을 합칩니다 (가장 확실한 방법)
+        const shareText = '당신의 2026년 새해를 여는 말씀은 무엇인가요?\n' + shareUrl;
 
         try {
-            // 이미지 파일을 Fetch -> Blob -> File 객체로 변환
             const response = await fetch(currentCardUrl);
             const blob = await response.blob();
             const file = new File([blob], '2026_word.jpg', { type: 'image/jpeg' });
 
-            // 네이티브 공유 (파일 공유) 시도
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 await navigator.share({
                     files: [file],
                     title: shareTitle,
-                    text: shareText, // 문구 포함
+                    text: shareText, // 여기에 URL이 포함됨
                 });
                 return;
             }
         } catch (error) {
-            console.log('파일 공유 지원 안 함, 대체 수단 실행');
+            console.log('파일 공유 불가, 대체 수단 실행');
         }
 
-        // 실패 시 카카오톡 링크 공유
+        // 카카오톡 공유
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
                 const fullImageUrl = new URL(currentCardUrl, window.location.href).href;
@@ -100,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     objectType: 'feed',
                     content: {
                         title: shareTitle,
-                        description: shareText, // 문구 포함
+                        description: '당신의 2026년 새해를 여는 말씀은 무엇인가요?', // 카톡은 URL 버튼이 따로 있어서 문구만
                         imageUrl: fullImageUrl,
                         link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                     },
@@ -110,10 +109,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (err) {}
         }
 
-        // 최후의 수단: 링크 복사
+        // 클립보드 복사
         try {
             await navigator.clipboard.writeText(shareUrl);
-            alert('주소가 복사되었습니다.\n' + shareText);
+            alert('주소가 복사되었습니다.\n당신의 2026년 새해를 여는 말씀은 무엇인가요?');
         } catch (err) {
             alert('공유할 수 없습니다.');
         }
