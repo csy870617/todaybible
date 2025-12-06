@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const KAKAO_API_KEY = '6c23c364b1865ae078131725d071c841'; 
     const SITE_URL = 'https://csy870617.github.io/todaybible/';
 
-    // 2. 카카오 SDK 초기화
     if (typeof Kakao !== 'undefined') {
         if (!Kakao.isInitialized()) {
             try { Kakao.init(KAKAO_API_KEY); } catch (e) {}
@@ -60,11 +59,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800); 
     };
 
-    // 이벤트 연결
     btnDraw.addEventListener('click', startDrawAction);
     envelopeArea.addEventListener('click', startDrawAction); 
 
-    // 다시 뽑기
     btnRetry.addEventListener('click', () => {
         resultImg.src = "";
         const envelope = document.querySelector('.card-3d');
@@ -72,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showPage(landingPage);
     });
 
-    // 저장하기
     btnDownload.addEventListener('click', () => {
         const link = document.createElement('a');
         link.href = currentCardUrl;
@@ -83,26 +79,22 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    // 공유하기
     btnShare.addEventListener('click', async () => {
         const shareUrl = window.location.href;
 
         // [1단계] 모바일 기본 공유
         if (navigator.share) {
             try {
-                await navigator.share({
-                    url: shareUrl, 
-                });
+                await navigator.share({ url: shareUrl });
                 return;
             } catch (err) {
                 console.log('네이티브 공유 취소/실패');
             }
         }
 
-        // [2단계] 카카오톡 SDK 공유
+        // [2단계] 카카오톡 SDK 공유 (썸네일 비율 1280x720 적용)
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
-                // ✅ [수정됨] 썸네일 이미지: thumbnail_3.png
                 const thumbUrl = new URL('thumbnail_3.png', SITE_URL).href;
 
                 Kakao.Share.sendDefault({
@@ -111,6 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         title: ' ', 
                         description: ' ',
                         imageUrl: thumbUrl,
+                        // ✅ [중요] 이미지 비율 설정 (1280 x 720)
+                        imageWidth: 1280,
+                        imageHeight: 720,
                         link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                     },
                 });
@@ -127,7 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 전체화면 & 뒤로가기
     const closeModal = () => {
         fullscreenModal.classList.remove('active');
         document.body.style.overflow = 'auto';
