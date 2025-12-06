@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. 설정
     const KAKAO_API_KEY = '6c23c364b1865ae078131725d071c841'; 
     const SITE_URL = 'https://csy870617.github.io/todaybible/';
 
-    // 2. 카카오 SDK 초기화
     if (typeof Kakao !== 'undefined') {
         if (!Kakao.isInitialized()) {
             try { Kakao.init(KAKAO_API_KEY); } catch (e) {}
@@ -24,13 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalCards = 105;
     let currentCardUrl = "";
 
-    // 화면 전환 함수
     function showPage(page) {
         [landingPage, loadingPage, resultPage].forEach(p => p.classList.remove('active'));
         window.scrollTo(0, 0);
         page.classList.add('active');
-        
-        // 페이지 전환 시 모달이 켜져있다면 닫기
         fullscreenModal.classList.remove('active');
         document.body.style.overflow = 'auto';
     }
@@ -73,20 +68,18 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    // 4. 공유하기
+    // 4. 공유하기 (✅ 문구 삭제, 썸네일 텍스트 수정)
     btnShare.addEventListener('click', async () => {
-        // ✅ 문구 수정됨
-        const shareText = '당신의 말씀은 무엇인가요?';
         const shareUrl = window.location.href;
-        const finalShareText = `${shareText}\n${shareUrl}`;
 
-        // [1단계] 모바일 기본 공유
+        // [1단계] 모바일 기본 공유 (링크만 전송)
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: '2026 새해를 여는 하나님의 말씀',
-                    text: shareText,
-                    url: shareUrl,
+                    // title은 일부 앱에서 무시됨
+                    title: '2026 새해를 여는 하나님의 말씀', 
+                    // text를 비워둠 (링크만 전송하기 위해)
+                    url: shareUrl, 
                 });
                 return;
             } catch (err) {
@@ -98,11 +91,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
                 const logoUrl = new URL('logo.png', SITE_URL).href;
+
                 Kakao.Share.sendDefault({
                     objectType: 'feed',
                     content: {
-                        title: shareText, 
-                        description: '카드를 눌러 말씀을 확인해보세요.',
+                        title: '2026 새해를 여는 하나님의 말씀',
+                        // ✅ 요청하신 썸네일 문구
+                        description: '2026년 당신을 위한 말씀은 무엇인가요?', 
                         imageUrl: logoUrl,
                         link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                     },
@@ -112,10 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (err) {}
         }
 
-        // [3단계] 클립보드 복사
+        // [3단계] 클립보드 복사 (오직 주소만 복사)
         try {
-            await navigator.clipboard.writeText(finalShareText);
-            alert('주소가 복사되었습니다.\n원하시는 곳에 붙여넣기 하세요.');
+            await navigator.clipboard.writeText(shareUrl);
+            alert('주소가 복사되었습니다.');
         } catch (err) {
             alert('공유 기능을 사용할 수 없습니다.');
         }
@@ -130,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = 'auto';
     };
 
-    // 1. 이미지 클릭 시 -> 열기 + 히스토리 추가
     resultImg.addEventListener('click', () => {
         fullscreenImg.src = currentCardUrl;
         fullscreenModal.classList.add('active');
@@ -138,12 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
         history.pushState({ modal: true }, null, "");
     });
 
-    // 2. 모달 클릭 시 -> 닫기 (뒤로가기 실행)
     fullscreenModal.addEventListener('click', () => {
         history.back();
     });
 
-    // 3. 뒤로가기 감지
     window.addEventListener('popstate', () => {
         if (fullscreenModal.classList.contains('active')) {
             closeModal();
