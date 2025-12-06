@@ -1,15 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ⚠️ [중요] 카카오 개발자 사이트(developers.kakao.com)에서 발급받은 'JavaScript 키'를 여기에 입력하세요.
-    // 키를 입력하지 않으면 자동으로 2순위(기본 공유)로 넘어갑니다.
-    const KAKAO_API_KEY = '여기에_발급받은_자바스크립트_키를_넣으세요'; 
+    // ✅ 사용자 님의 카카오 자바스크립트 키 적용 완료
+    const KAKAO_API_KEY = '6c23c364b1865ae078131725d071c841'; 
 
     // 카카오 SDK 초기화
     if (typeof Kakao !== 'undefined') {
         if (!Kakao.isInitialized()) {
             try {
                 Kakao.init(KAKAO_API_KEY);
+                console.log('Kakao SDK Initialized');
             } catch (e) {
-                console.log('카카오 키가 설정되지 않았습니다.');
+                console.warn('Kakao SDK Init Failed:', e);
             }
         }
     }
@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnShare = document.getElementById('btn-share');
     const resultImg = document.getElementById('result-img');
 
+    // 카드 총 개수
     const totalCards = 105;
     let currentCardUrl = "";
 
@@ -33,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => page.classList.add('active'), 50);
     }
 
-    // 1. 말씀 뽑기
+    // 1. 뽑기
     btnDraw.addEventListener('click', () => {
         showPage(loadingPage);
         setTimeout(() => {
@@ -70,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     });
 
-    // 4. 공유하기 (카톡 -> 기본공유 -> 복사)
+    // 4. 공유하기 (카톡 -> 기본 -> 복사)
     btnShare.addEventListener('click', async () => {
         const shareData = {
             title: '2026 새해를 여는 하나님의 말씀',
@@ -78,11 +79,10 @@ document.addEventListener('DOMContentLoaded', () => {
             url: window.location.href,
         };
 
-        // 이미지의 전체 URL 생성 (카카오 공유용)
-        // 주의: 로컬(내 컴퓨터)에서는 작동 안 함. 실제 웹호스팅 서버에 올려야 작동.
+        // 절대 경로 변환 (카카오 공유용)
         const fullImageUrl = new URL(currentCardUrl, window.location.href).href;
 
-        // [1단계] 카카오톡 공유 시도
+        // [1순위] 카카오톡 공유
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
                 Kakao.Share.sendDefault({
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     content: {
                         title: shareData.title,
                         description: shareData.text,
-                        imageUrl: fullImageUrl, // 뽑은 카드 이미지를 썸네일로 표시
+                        imageUrl: fullImageUrl, // 뽑은 카드 이미지를 썸네일로
                         link: {
                             mobileWebUrl: shareData.url,
                             webUrl: shareData.url,
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     buttons: [
                         {
-                            title: '말씀 확인하기',
+                            title: '말씀 뽑으러 가기',
                             link: {
                                 mobileWebUrl: shareData.url,
                                 webUrl: shareData.url,
@@ -106,23 +106,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                     ],
                 });
-                return; // 카카오톡 공유 성공 시 종료
+                return; // 성공 시 종료
             } catch (err) {
-                console.log('카카오 공유 실패, 다음 단계로 이동');
+                console.log('카카오 공유 실패, 다음 단계로...');
             }
         }
 
-        // [2단계] 기본 공유(Navigator Share) 시도
+        // [2순위] 기본 공유창
         if (navigator.share) {
             try {
                 await navigator.share(shareData);
-                return; // 공유 성공 시 종료
+                return;
             } catch (err) {
-                // 사용자가 취소했거나 에러 발생 시 다음 단계로
+                // 취소 혹은 실패 시 다음 단계로
             }
         }
 
-        // [3단계] 클립보드 복사 (최후의 수단)
+        // [3순위] 클립보드 복사
         try {
             await navigator.clipboard.writeText(window.location.href);
             alert('주소가 복사되었습니다! 원하시는 곳에 붙여넣기 하세요.');
