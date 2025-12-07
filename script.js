@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const KAKAO_API_KEY = '6c23c364b1865ae078131725d071c841'; 
     const SITE_URL = 'https://csy870617.github.io/todaybible/';
 
+    // 2. 카카오 SDK 초기화
     if (typeof Kakao !== 'undefined') {
         if (!Kakao.isInitialized()) {
             try { Kakao.init(KAKAO_API_KEY); } catch (e) {}
@@ -95,7 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // [2단계] 카카오톡 SDK 공유 (썸네일 비율 1280x720 적용)
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
-                const thumbUrl = new URL('thumbnail_3.png', SITE_URL).href;
+                // ✅ [수정됨] 썸네일 이미지: thumbnail_4.png
+                const thumbUrl = new URL('thumbnail_4.png', SITE_URL).href;
 
                 Kakao.Share.sendDefault({
                     objectType: 'feed',
@@ -103,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         title: ' ', 
                         description: ' ',
                         imageUrl: thumbUrl,
-                        // ✅ [중요] 이미지 비율 설정 (1280 x 720)
                         imageWidth: 1280,
                         imageHeight: 720,
                         link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
