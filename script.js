@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         description: ' ',
                         imageUrl: thumbUrl,
                         imageWidth: 1280,
-                        imageHeight: 720,
+                        imageHeight: 800,
                         link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                     },
                 });
@@ -144,4 +144,5 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }
     });
+
 });
