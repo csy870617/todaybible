@@ -10,13 +10,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // DOM 요소 선택
     const landingPage = document.getElementById('page-landing');
     const loadingPage = document.getElementById('page-loading');
     const resultPage = document.getElementById('page-result');
+    
     const btnDraw = document.getElementById('btn-draw');
     const btnRetry = document.getElementById('btn-retry');
-    const btnDownload = document.getElementById('btn-download');
-    const btnShare = document.getElementById('btn-share');
+    
+    // ✅ 버튼 ID 변경됨
+    const btnSendCard = document.getElementById('btn-send-card');   // 말씀 보내기 (이미지)
+    const btnShareSite = document.getElementById('btn-share-site'); // 사이트 공유 (링크)
+    
     const resultImg = document.getElementById('result-img');
     const fullscreenModal = document.getElementById('fullscreen-modal');
     const fullscreenImg = document.getElementById('fullscreen-img');
@@ -25,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalCards = 105;
     let currentCardUrl = "";
 
+    // 화면 전환 함수
     function showPage(page) {
         [landingPage, loadingPage, resultPage].forEach(p => p.classList.remove('active'));
         window.scrollTo(0, 0);
@@ -33,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = 'auto';
     }
 
+    // 뽑기 시작 함수
     const startDrawAction = () => {
         const envelope = document.querySelector('.card-3d');
         if(envelope.classList.contains('open')) return;
@@ -60,9 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800); 
     };
 
+    // 이벤트 연결 (뽑기)
     btnDraw.addEventListener('click', startDrawAction);
     envelopeArea.addEventListener('click', startDrawAction); 
 
+    // ✅ [버튼 2] '다른 말씀' (처음으로)
     btnRetry.addEventListener('click', () => {
         resultImg.src = "";
         const envelope = document.querySelector('.card-3d');
@@ -70,20 +79,41 @@ document.addEventListener('DOMContentLoaded', () => {
         showPage(landingPage);
     });
 
-    btnDownload.addEventListener('click', () => {
-        const link = document.createElement('a');
-        link.href = currentCardUrl;
-        link.download = `2026_새해말씀.jpg`;
-        link.target = '_blank';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    // ✅ [버튼 1] '말씀 보내기' (이미지 파일 공유)
+    btnSendCard.addEventListener('click', async () => {
+        try {
+            // 이미지를 Fetch해서 Blob으로 변환
+            const response = await fetch(currentCardUrl);
+            const blob = await response.blob();
+            const file = new File([blob], "2026_새해말씀.jpg", { type: "image/jpeg" });
+
+            // 모바일 네이티브 공유 (파일 공유) 시도
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: '2026 말씀카드',
+                    text: '나를 위한 하나님의 말씀이 도착했습니다.',
+                });
+            } else {
+                // PC 등 파일 공유 미지원 시 -> 다운로드로 대체
+                throw new Error("파일 공유 미지원");
+            }
+        } catch (e) {
+            // 실패 시 다운로드 진행
+            const link = document.createElement('a');
+            link.href = currentCardUrl;
+            link.download = `2026_새해말씀.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     });
 
-    btnShare.addEventListener('click', async () => {
+    // ✅ [버튼 3] '2026 말씀카드뽑기 공유' (사이트 링크 공유)
+    btnShareSite.addEventListener('click', async () => {
         const shareUrl = window.location.href;
 
-        // [1단계] 모바일 기본 공유
+        // [1단계] 모바일 네이티브 공유 (URL)
         if (navigator.share) {
             try {
                 await navigator.share({ url: shareUrl });
@@ -93,10 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // [2단계] 카카오톡 SDK 공유 (썸네일 비율 1280x720 적용)
+        // [2단계] 카카오톡 SDK 공유
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
-                // ✅ [수정됨] 썸네일 이미지: thumbnail_4.png
                 const thumbUrl = new URL('thumbnail_4.png', SITE_URL).href;
 
                 Kakao.Share.sendDefault({
@@ -106,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         description: ' ',
                         imageUrl: thumbUrl,
                         imageWidth: 1280,
-                        imageHeight: 800,
+                        imageHeight: 720,
                         link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
                     },
                 });
@@ -123,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 전체화면 & 뒤로가기 로직
     const closeModal = () => {
         fullscreenModal.classList.remove('active');
         document.body.style.overflow = 'auto';
