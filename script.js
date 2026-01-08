@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSaveImg.addEventListener('click', () => {
         const link = document.createElement('a');
         link.href = currentCardUrl;
-        link.download = `2026_새해말씀.jpg`; // 다운로드될 파일명
+        link.download = `2026_오늘의 말씀.jpg`; // 다운로드될 파일명
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -150,4 +150,5 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }
     });
+
 });
