@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // [2단계] 카카오톡 SDK 공유
         if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
             try {
-                const thumbUrl = new URL('thumbnail_4.png', SITE_URL).href;
+                const thumbUrl = new URL('thumbnail_5.png', SITE_URL).href;
 
                 Kakao.Share.sendDefault({
                     objectType: 'feed',
@@ -152,3 +152,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 });
+
