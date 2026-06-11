@@ -39,29 +39,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const startDrawAction = () => {
         const envelope = document.querySelector('.card-3d');
-        if(envelope.classList.contains('open')) return;
+        if(!envelope || envelope.classList.contains('open')) return;
 
-        envelope.classList.add('open'); 
+        envelope.classList.add('open');
 
         setTimeout(() => {
             showPage(loadingPage);
             setTimeout(() => {
                 const randomIndex = Math.floor(Math.random() * totalCards) + 1;
                 const formattedNum = String(randomIndex).padStart(3, '0');
-                currentCardUrl = `cards/${formattedNum}.JPG`; 
-                
+                const cardUrl = `cards/${formattedNum}.JPG`;
+
                 const imgLoader = new Image();
-                imgLoader.src = currentCardUrl;
+                let settled = false;
+
+                const failLoad = () => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(loadTimer);
+                    alert('이미지를 불러오지 못했습니다.\n네트워크 상태를 확인한 뒤 다시 시도해 주세요.');
+                    envelope.classList.remove('open');
+                    showPage(landingPage);
+                };
+                const loadTimer = setTimeout(failLoad, 15000);
+
                 imgLoader.onload = () => {
-                    resultImg.src = currentCardUrl;
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(loadTimer);
+                    currentCardUrl = cardUrl;
+                    resultImg.src = cardUrl;
                     showPage(resultPage);
                 };
-                imgLoader.onerror = () => {
-                    alert(`이미지를 찾을 수 없습니다.\n경로: ${currentCardUrl}`);
-                    showPage(landingPage);
-                }
-            }, 2000); 
-        }, 800); 
+                imgLoader.onerror = failLoad;
+                imgLoader.src = cardUrl;
+            }, 2000);
+        }, 800);
     };
 
     btnDraw.addEventListener('click', startDrawAction);
@@ -77,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ✅ [버튼 1] 말씀 저장 (단순 다운로드 기능)
     btnSaveImg.addEventListener('click', () => {
+        if (!currentCardUrl) return;
         const link = document.createElement('a');
         link.href = currentCardUrl;
         link.download = `2026_오늘의 말씀.jpg`; // 다운로드될 파일명
@@ -95,12 +109,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 await navigator.share({ url: shareUrl });
                 return;
             } catch (err) {
-                console.log('네이티브 공유 취소/실패');
+                // 사용자가 공유 창을 직접 닫은 경우, 다른 공유 수단으로 넘어가지 않음
+                if (err && err.name === 'AbortError') return;
             }
         }
 
         // [2단계] 카카오톡 SDK 공유
-        if (typeof Kakao !== 'undefined' && Kakao.isInitialized()) {
+        if (typeof Kakao !== 'undefined' && Kakao.isInitialized() && Kakao.Share) {
             try {
                 const thumbUrl = new URL('thumbnail_5.png', SITE_URL).href;
 
@@ -135,14 +150,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     resultImg.addEventListener('click', () => {
+        if (!currentCardUrl) return;
         fullscreenImg.src = currentCardUrl;
         fullscreenModal.classList.add('active');
         document.body.style.overflow = 'hidden';
-        history.pushState({ modal: true }, null, "");
+        try { history.pushState({ modal: true }, "", ""); } catch (e) {}
     });
 
     fullscreenModal.addEventListener('click', () => {
-        history.back();
+        // pushState가 실패한 환경에서는 history.back()이 페이지 이탈로 이어지므로 직접 닫음
+        if (history.state && history.state.modal) {
+            history.back();
+        } else {
+            closeModal();
+        }
     });
 
     window.addEventListener('popstate', () => {
