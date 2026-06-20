@@ -30,10 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentCardUrl = "";
 
     function showPage(page) {
-        [landingPage, loadingPage, resultPage].forEach(p => p.classList.remove('active'));
+        [landingPage, loadingPage, resultPage].forEach(p => p && p.classList.remove('active'));
         window.scrollTo(0, 0);
-        page.classList.add('active');
-        fullscreenModal.classList.remove('active');
+        if (page) page.classList.add('active');
+        fullscreenModal?.classList.remove('active');
         document.body.style.overflow = 'auto';
     }
 
@@ -77,19 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800);
     };
 
-    btnDraw.addEventListener('click', startDrawAction);
-    envelopeArea.addEventListener('click', startDrawAction); 
+    // 요소가 없을 때 한 줄에서 스크립트 전체가 멈추지 않도록 모든 리스너에 null 가드 적용
+    btnDraw?.addEventListener('click', startDrawAction);
+    envelopeArea?.addEventListener('click', startDrawAction);
 
     // ✅ [버튼 2] 다른 말씀 (처음으로)
-    btnRetry.addEventListener('click', () => {
-        resultImg.src = "";
+    btnRetry?.addEventListener('click', () => {
+        // 빈 src("") 대신 속성 제거: 일부 브라우저가 빈 src를 페이지 주소로 재요청하는 부작용 방지
+        resultImg.removeAttribute('src');
         const envelope = document.querySelector('.card-3d');
         if (envelope) envelope.classList.remove('open');
         showPage(landingPage);
     });
 
     // ✅ [버튼 1] 말씀 저장 (단순 다운로드 기능)
-    btnSaveImg.addEventListener('click', () => {
+    btnSaveImg?.addEventListener('click', () => {
         if (!currentCardUrl) return;
         const link = document.createElement('a');
         link.href = currentCardUrl;
@@ -100,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ✅ [버튼 3] 친구에게 공유하기 (사이트 링크 공유)
-    btnShareSite.addEventListener('click', async () => {
+    btnShareSite?.addEventListener('click', async () => {
         const shareUrl = window.location.href;
 
         // [1단계] 모바일 네이티브 공유
@@ -145,19 +147,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 전체화면 기능
     const closeModal = () => {
-        fullscreenModal.classList.remove('active');
+        fullscreenModal?.classList.remove('active');
         document.body.style.overflow = 'auto';
     };
 
-    resultImg.addEventListener('click', () => {
+    resultImg?.addEventListener('click', () => {
         if (!currentCardUrl) return;
+        // 모달이 이미 열려 있으면 중복으로 열지 않음 (history 항목 중복 누적 방지)
+        if (fullscreenModal.classList.contains('active')) return;
         fullscreenImg.src = currentCardUrl;
         fullscreenModal.classList.add('active');
         document.body.style.overflow = 'hidden';
         try { history.pushState({ modal: true }, "", ""); } catch (e) {}
     });
 
-    fullscreenModal.addEventListener('click', () => {
+    fullscreenModal?.addEventListener('click', () => {
         // pushState가 실패한 환경에서는 history.back()이 페이지 이탈로 이어지므로 직접 닫음
         if (history.state && history.state.modal) {
             history.back();
@@ -167,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.addEventListener('popstate', () => {
-        if (fullscreenModal.classList.contains('active')) {
+        if (fullscreenModal && fullscreenModal.classList.contains('active')) {
             closeModal();
         }
     });
